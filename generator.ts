@@ -96,9 +96,13 @@ ${queryFields(object)}}
  */
 export const gql = (chunks: TemplateStringsArray, ...types: GQType[]) =>
   types.reduce<string>(
-    (acc, val, i) =>
-      (acc +=
-        (isGQObject(val) ? queryFields(val) : queryObject(val)) +
-        chunks[i + 1]),
+    (acc, val, i) => (acc += stringify(val) + chunks[i + 1]),
     chunks[0]
   );
+
+const stringify = (type: GQType): string =>
+  Array.isArray(type)
+    ? type.map(item => stringify(item)).join("")
+    : isGQObject(type)
+    ? queryFields(type)
+    : queryObject(type);
